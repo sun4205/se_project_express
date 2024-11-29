@@ -1,18 +1,10 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
+const router = require("express").Router();
+const User = require("../models/user");
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true, minlength: 2, maxlenght: 30 },
-  avatar: {
-    type: String,
-    required: [true, "The avatar field is required."],
-    validate: {
-      validator(value) {
-        return validator.isURL(value);
-      },
-      message:"You must enter a valid URL",
-    },
-  },
-});
+router.get("/users", (req, res) => {
+    console.log("GET /users called"); 
+    res.send("Users route"); 
+  });
+  
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = router;
