@@ -16,8 +16,11 @@ const getUsers = (req, res) => {
 const createUser = (req,res) => {
     const {name, avatar} = req.body;
     console.log(name,avatar);
+    if (!name || !avatar) {
+        return res.status(400).send({ message: "Both 'name' and 'avatar' are required." });
+    }
     User.create({name,avatar})
-    .then((User)=>res.status(201).send(user))
+    .then((user)=>res.status(201).send(user))
     .catch((err)=>{
         console.error(err);
         return res.status(500).send({ message: err.message });
