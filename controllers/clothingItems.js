@@ -14,6 +14,7 @@ const getItems = (req, res) => {
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id; 
+  console.log("User ID:", owner);
 
   if (!name || !weather || !imageUrl || !owner) {
     return res.status(400).send({ message: "All fields (name, weather, imageUrl, owner) are required." });
@@ -31,6 +32,7 @@ const createItem = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
+    console.log("User ID in deleteItem:", req.user._id);
   const { itemId } = req.params;
   Item.findByIdAndDelete(itemId)
     .then((item) => {
