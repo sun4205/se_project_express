@@ -15,6 +15,11 @@ const getUsers = (req, res) => {
 const getUser = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
+  .orFail(() => {
+    const error = new Error("User not found.");
+    error.statusCode = NOT_FOUND;
+    throw error;
+  })
     .then((user) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found." });

@@ -36,6 +36,11 @@ const deleteItem = (req, res) => {
     console.log("User ID in deleteItem:", req.user._id);
   const { itemId } = req.params;
   Item.findByIdAndDelete(itemId)
+  .orFail(() => {
+    const error = new Error("Item not found.");
+    error.statusCode = NOT_FOUND;
+    throw error;
+  })
     .then((item) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
