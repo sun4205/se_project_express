@@ -26,7 +26,7 @@ const getUser = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid user ID format." });
   }
 
-  User.findById(userId)
+  return User.findById(userId)
     .then((user) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found." });
@@ -51,7 +51,7 @@ const createUser = (req, res) => {
       .send({ message: "Both 'name' and 'avatar' are required." });
   }
 
-  User.create({ name, avatar })
+  return User.create({ name, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       console.error("Error creating user:", err);

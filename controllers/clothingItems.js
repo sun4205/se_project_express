@@ -23,7 +23,7 @@ const createItem = (req, res) => {
   
     const owner = req.user._id;
   
-    Item.create({ name, weather, imageUrl, owner })
+    return Item.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       console.error(err);
@@ -42,7 +42,7 @@ const getItem = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid ID format." });
   }
 
-  Item.findById(id)
+ return Item.findById(id)
     .then((item) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
@@ -62,7 +62,7 @@ const deleteItem = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
   }
 
-  Item.findByIdAndDelete(itemId)
+  return Item.findByIdAndDelete(itemId)
     .orFail(() => {
       const error = new Error("Item not found.");
       error.statusCode = NOT_FOUND;
@@ -88,7 +88,7 @@ const likeItem = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
   }
 
-  Item.findByIdAndUpdate(
+  return Item.findByIdAndUpdate(
     itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true }
@@ -97,7 +97,7 @@ const likeItem = (req, res) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
       }
-      res.status(200).send(item);
+      return res.status(200).send(item);
     })
     .catch((err) => {
       console.error(err);
@@ -112,7 +112,7 @@ const dislikeItem = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
   }
 
-  Item.findByIdAndUpdate(
+  return Item.findByIdAndUpdate(
     itemId,
     { $pull: { likes: req.user._id } },
     { new: true }
@@ -121,7 +121,7 @@ const dislikeItem = (req, res) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
       }
-      res.status(200).send(item);
+      return res.status(200).send(item);
     })
     .catch((err) => {
       console.error(err);
