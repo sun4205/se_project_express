@@ -15,41 +15,43 @@ const getItems = (req, res) => {
 };
 
 const createItem = (req, res) => {
-  const { name, weather, imageUrl } = req.body;
-  const owner = req.user._id;
+    const { name, weather, imageUrl } = req.body;
 
-  if (!name || !weather || !imageUrl || !owner) {
-    return res.status(BAD_REQUEST).send({ message: "All fields (name, weather, imageUrl, owner) are required." });
-  }
-
-  Item.create({ name, weather, imageUrl, owner })
+    if (!req.user || !req.user._id) {
+      return res.status(BAD_REQUEST).send({ message: "User is not authenticated." });
+    }
+  
+    const owner = req.user._id;
+  
+    Item.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: err.message });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server." });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error occurred on the server." });
     });
+
 };
 
 const getItem = (req, res) => {
   const { id } = req.params;
 
   if (!isValidObjectId(id)) {
-    return res.status(400).send({ message: "Invalid ID format." });
+    return res.status(BAD_REQUEST).send({ message: "Invalid ID format." });
   }
 
   Item.findById(id)
     .then((item) => {
       if (!item) {
-        return res.status(404).send({ message: "Item not found." });
+        return res.status(NOT_FOUND).send({ message: "Item not found." });
       }
-      res.status(200).send(item);
+      return res.status(200).send(item);
     })
     .catch((err) => {
       console.error(`Error fetching item by ID: ${id}`, err);
-      res.status(500).send({ message: "An error occurred on the server." });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error occurred on the server." });
     });
 };
 
