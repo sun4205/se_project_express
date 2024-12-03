@@ -72,7 +72,10 @@ const deleteItem = (req, res) => {
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server." });
+     if(err.statusCode === NOT_FOUND){
+        return res.status(NOT_FOUND).send({message:"Item not found."});
+     }
+     return res.status(INTERNAL_SERVER_ERROR).send({message:"An error occured on the server"});
     });
 };
 
