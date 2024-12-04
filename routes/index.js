@@ -4,7 +4,7 @@ const itemRouter = require("./clothingItems");
 
 const router = express.Router();
 
-router.use("/users",userRouter);
+router.use("/users", userRouter);
 router.use("/items", itemRouter);
 
 module.exports = router;

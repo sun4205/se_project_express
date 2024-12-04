@@ -6,7 +6,6 @@ const {
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
-
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -17,7 +16,6 @@ const getUsers = (req, res) => {
         .send({ message: "An error occurred on the server." });
     });
 };
-
 
 const getUser = (req, res) => {
   const { userId } = req.params;
@@ -40,7 +38,6 @@ const getUser = (req, res) => {
         .send({ message: "An error occurred on the server." });
     });
 };
-
 
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
