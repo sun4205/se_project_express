@@ -21,11 +21,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/", mainRouter);
-app.use((req, res) => {
-  res
-    .status(STATUS_CODE.NOT_FOUND)
-    .send({ message: "Requested resource not found." });
-});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
