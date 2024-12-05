@@ -4,12 +4,12 @@ const itemRouter = require("./clothingItems");
 const { NOT_FOUND } = require("../utils/errors");
 
 const router = express.Router();
-const app = express();
+
 
 router.use("/users", userRouter);
 router.use("/items", itemRouter);
 
-app.use((req, res) => {
+router.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found." });
 });
 
