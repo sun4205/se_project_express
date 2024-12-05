@@ -4,6 +4,7 @@ const itemRouter = require("./clothingItems");
 const { NOT_FOUND } = require("../utils/errors");
 
 const router = express.Router();
+const app = express();
 
 router.use("/users", userRouter);
 router.use("/items", itemRouter);
