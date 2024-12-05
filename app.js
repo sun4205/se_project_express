@@ -6,10 +6,6 @@ const { NOT_FOUND } = require("./utils/errors");
 const app = express();
 const { PORT = 3001 } = process.env;
 
-const STATUS_CODE = {
-    NOT_FOUND:404,
-};
-
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => {
@@ -26,7 +22,9 @@ app.use((req, res, next) => {
 });
 app.use("/", mainRouter);
 app.use((req, res) => {
-  res.status(STATUS_CODE.NOT_FOUND).send({ message: "Requested resource not found." });
+  res
+    .status(STATUS_CODE.NOT_FOUND)
+    .send({ message: "Requested resource not found." });
 });
 
 app.listen(PORT, () => {
