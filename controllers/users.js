@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const User = require("../models/user");
+const bcrypt = require("bcryptjs");
 const {
   BAD_REQUEST,
+  CONFLICT,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
@@ -40,23 +42,49 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  const { name, avatar, email, password } = req.body;
 
-  if (!name || !avatar) {
+  if (!name || !avatar || !email || !password) {
     return res
       .status(BAD_REQUEST)
-      .send({ message: "Both 'name' and 'avatar' are required." });
+      .send({
+        message:
+          "All fields ('name', 'avatar', 'email', and 'password') are required.",
+      });
   }
 
-  return User.create({ name, avatar })
-    .then((user) => res.status(201).send(user))
+  return bcrypt
+    .hash(password, 10)
+    .then((hashedPassword) => {
+      return User.create({
+        name,
+        avatar,
+        email,
+        password: hashedPassword,
+      });
+    })
+    .then((user) => {
+      const userResponse = {
+        _id: user._id,
+        name: user.name,
+        avatar: user.avatar,
+        email: user.email,
+      };
+      return res.status(201).send(userResponse);
+    })
     .catch((err) => {
       console.error("Error creating user:", err);
+      if (err.code === 11000) {
+        return res
+          .status(CONFLICT)
+          .send({ message: "A user with this email already exists." });
+      }
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid data provided for user creation." });
       }
+
       return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
