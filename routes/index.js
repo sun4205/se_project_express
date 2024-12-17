@@ -8,6 +8,8 @@ const router = express.Router();
 
 router.use("/users", userRouter);
 router.use("/items", itemRouter);
+router.post('/signin', login);
+router.post('/signup', createUser);
 
 router.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found." });
