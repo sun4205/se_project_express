@@ -22,8 +22,8 @@ const getUsers = (req, res) => {
     });
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
+const getCurrentUser = (req, res) => {
+  const userId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return res.status(BAD_REQUEST).send({ message: "Invalid user ID format." });
@@ -117,4 +117,4 @@ const login = (req, res) => {
       res.status(UNAUTHORIZED).send({ message: "Incorrect email or password." });
     });
 };
-module.exports = { getUsers, getUser, createUser, login };
+module.exports = { getUsers, getCurrentUser, createUser, login };
