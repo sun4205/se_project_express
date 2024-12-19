@@ -9,7 +9,8 @@ const router = express.Router();
 
 router.post("/signin", login);
 router.post("/signup", createUser);
-router.get("/items", itemRouter);
+
+router.use("/items", itemRouter);
 
 router.use(auth);
 
