@@ -148,7 +148,7 @@ const updateProfile = (req, res) => {
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
       
-    })
-    .finally(() => {});
+    });
+    
 };
 module.exports = { getUsers, getCurrentUser, createUser, login, updateProfile };
