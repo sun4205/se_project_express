@@ -4,6 +4,7 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
+  FORBIDDEN,
 } = require("../utils/errors");
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -76,11 +77,11 @@ const deleteItem = (req, res) => {
 
     .then((item) => {
       if (!item) {
-        res.status(200).send({ message: "Item deleted successfully." });
+       return res.status(NOT_FOUND).send({ message: "Item not found." });
       }
       if (item.owner.toString() !== req.user._id) {
         return res
-          .status(403)
+          .status(FORBIDDEN)
           .send({ message: "You do not have permission to delete this item." });
       }
 
