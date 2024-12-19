@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST,
@@ -11,7 +11,7 @@ const {
   UNAUTHORIZED,
 } = require("../utils/errors");
 
-const getUsers = (req, res) => {
+const getUsers = (req, res) => 
   User.find({})
     .then((users) => res.status(200).send(users))
     .catch((err) => {
@@ -20,7 +20,7 @@ const getUsers = (req, res) => {
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
     });
-};
+
 
 const getCurrentUser = (req, res) => {
   const userId = req.user._id;
@@ -107,11 +107,11 @@ const login = (req, res) => {
         expiresIn: "7d",
       });
 
-      res.status(200).send({ token });
+     return res.status(200).send({ token });
     })
     .catch((err) => {
       console.error("Login error:", err.message);
-      res
+      return res
         .status(UNAUTHORIZED)
         .send({ message: "Incorrect email or password." });
     });
@@ -136,7 +136,7 @@ const updateProfile = (req, res) => {
       if (!updatedUser) {
         return res.status(NOT_FOUND).send({ message: "User not found." });
       }
-      res.status(200).send(updatedUser);
+      return res.status(200).send(updatedUser);
     })
     .catch((err) => {
       console.error("Error updating user profile:", err);
