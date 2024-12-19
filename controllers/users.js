@@ -126,7 +126,7 @@ const updateProfile = (req, res) => {
     });
   }
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     userId,
     { name, avatar },
     { new: true, runValidators: true }
