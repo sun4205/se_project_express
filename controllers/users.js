@@ -56,14 +56,14 @@ const createUser = (req, res) => {
 
   return bcrypt
     .hash(password, 10)
-    .then((hashedPassword) => {
-      return User.create({
+    .then((hashedPassword) => 
+       User.create({
         name,
         avatar,
         email,
         password: hashedPassword,
-      });
-    })
+      })
+    )
     .then((user) => {
       const userResponse = {
         _id: user._id,
@@ -111,9 +111,8 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error("Login error:", err.message);
-      return res
-        .status(UNAUTHORIZED)
-        .send({ message: "Incorrect email or password." });
+       res.status(UNAUTHORIZED).send({ message: "Incorrect email or password." });
+        return;
     });
 };
 
