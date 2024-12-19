@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken"); 
+const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST,
@@ -48,12 +48,10 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!name || !avatar || !email || !password) {
-    return res
-      .status(BAD_REQUEST)
-      .send({
-        message:
-          "All fields ('name', 'avatar', 'email', and 'password') are required.",
-      });
+    return res.status(BAD_REQUEST).send({
+      message:
+        "All fields ('name', 'avatar', 'email', and 'password') are required.",
+    });
   }
 
   return bcrypt
@@ -106,15 +104,50 @@ const login = (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: "7d", 
+        expiresIn: "7d",
       });
 
-     
       res.status(200).send({ token });
     })
     .catch((err) => {
       console.error("Login error:", err.message);
-      res.status(UNAUTHORIZED).send({ message: "Incorrect email or password." });
+      res
+        .status(UNAUTHORIZED)
+        .send({ message: "Incorrect email or password." });
     });
 };
-module.exports = { getUsers, getCurrentUser, createUser, login };
+
+const updateProfile = (req, res) => {
+  const userId = req.user._id;
+  const { name, avatar } = req.body;
+
+  if (!name || !avatar) {
+    return res.status(BAD_REQUEST).send({
+      message: "Both 'name' and 'avatar' fields are required.",
+    });
+  }
+
+  User.findByIdAndUpdate(
+    userId,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        return res.status(NOT_FOUND).send({ message: "User not found." });
+      }
+      res.status(200).send(updatedUser);
+    })
+    .catch((err) => {
+      console.error("Error updating user profile:", err);
+      if (err.name === "ValidationError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data provided for profile update." });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error occurred on the server." });
+    });
+};
+module.exports = { getUsers, getCurrentUser, createUser, login, updateProfile };
