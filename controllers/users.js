@@ -143,11 +143,12 @@ const updateProfile = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid data provided for profile update." });
-      }else{
+      }
       return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
-      }
-    });
+      
+    })
+    .return();
 };
 module.exports = { getUsers, getCurrentUser, createUser, login, updateProfile };
