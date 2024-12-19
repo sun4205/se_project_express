@@ -112,7 +112,7 @@ const login = (req, res) => {
     .catch((err) => {
       console.error("Login error:", err.message);
        res.status(UNAUTHORIZED).send({ message: "Incorrect email or password." });
-        return;
+        
     });
 };
 
