@@ -72,21 +72,28 @@ const deleteItem = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
   }
 
-  return Item.findByIdAndDelete(itemId)
-    .orFail(() => {
-      const error = new Error("Item not found.");
-      error.statusCode = NOT_FOUND;
-      throw error;
+  return Item.findById(itemId)
+
+    .then((item) => {
+      if (!item) {
+        res.status(200).send({ message: "Item deleted successfully." });
+      }
+      if (item.owner.toString() !== req.user._id) {
+        return res
+          .status(403)
+          .send({ message: "You do not have permission to delete this item." });
+      }
+
+      return Item.findByIdAndDelete(itemId).then(() =>
+        res.status(200).send({ message: "Item deleted successfully." })
+      );
     })
-    .then(() => res.status(200).send({ message: "Item deleted successfully." }))
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
       }
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(NOT_FOUND).send({ message: "Item not found." });
-      }
+
       return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server" });
