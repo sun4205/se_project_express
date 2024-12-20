@@ -11,7 +11,7 @@ const {
   UNAUTHORIZED,
 } = require("../utils/errors");
 
-const getUsers = (req, res) => 
+const getUsers = (req, res) =>
   User.find({})
     .then((users) => res.status(200).send(users))
     .catch((err) => {
@@ -20,7 +20,6 @@ const getUsers = (req, res) =>
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
     });
-
 
 const getCurrentUser = (req, res) => {
   const userId = req.user._id;
@@ -54,42 +53,45 @@ const createUser = (req, res) => {
     });
   }
 
-  return bcrypt
-    .hash(password, 10)
-    .then((hashedPassword) => 
-       User.create({
-        name,
-        avatar,
-        email,
-        password: hashedPassword,
-      })
-    )
-    .then((user) => {
-      const userResponse = {
-        _id: user._id,
-        name: user.name,
-        avatar: user.avatar,
-        email: user.email,
-      };
-      return res.status(201).send(userResponse);
-    })
-    .catch((err) => {
-      console.error("Error creating user:", err);
-      if (err.code === 11000) {
-        return res
-          .status(CONFLICT)
-          .send({ message: "A user with this email already exists." });
-      }
-      if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid data provided for user creation." });
-      }
+  User.findOne({ email }).then((existingUser) => {
+    if (existingUser) {
+      return res.status(CONFLICT).send({
+        message: "A user with this email already exists.",
+      });
+    }
 
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occurred on the server." });
-    });
+    return bcrypt
+      .hash(password, 10)
+      .then((hashedPassword) =>
+        User.create({
+          name,
+          avatar,
+          email,
+          password: hashedPassword,
+        })
+      )
+      .then((user) => {
+        const userResponse = {
+          _id: user._id,
+          name: user.name,
+          avatar: user.avatar,
+          email: user.email,
+        };
+        return res.status(201).send(userResponse);
+      })
+      .catch((err) => {
+        console.error("Error creating user:", err);
+        if (err.name === "ValidationError") {
+          return res
+            .status(BAD_REQUEST)
+            .send({ message: "Invalid data provided for user creation." });
+        }
+
+        return res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "An error occurred on the server." });
+      });
+  });
 };
 
 const login = (req, res) => {
@@ -107,12 +109,13 @@ const login = (req, res) => {
         expiresIn: "7d",
       });
 
-     return res.status(200).send({ token });
+      return res.status(200).send({ token });
     })
     .catch((err) => {
       console.error("Login error:", err.message);
-       res.status(UNAUTHORIZED).send({ message: "Incorrect email or password." });
-        
+      res
+        .status(UNAUTHORIZED)
+        .send({ message: "Incorrect email or password." });
     });
 };
 
@@ -147,8 +150,6 @@ const updateProfile = (req, res) => {
       return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
-      
     });
-    
 };
 module.exports = { getUsers, getCurrentUser, createUser, login, updateProfile };
