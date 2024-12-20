@@ -53,7 +53,7 @@ const createUser = (req, res) => {
     });
   }
 
-  User.findOne({ email }).then((existingUser) => {
+  return User.findOne({ email }).then((existingUser) => {
     if (existingUser) {
       return res.status(CONFLICT).send({
         message: "A user with this email already exists.",
