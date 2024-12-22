@@ -11,16 +11,6 @@ const {
   UNAUTHORIZED,
 } = require("../utils/errors");
 
-const getUsers = (req, res) =>
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => {
-      console.error("Error fetching users:", err);
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occurred on the server." });
-    });
-
 const getCurrentUser = (req, res) => {
   const userId = req.user._id;
 
@@ -37,6 +27,11 @@ const getCurrentUser = (req, res) => {
     })
     .catch((err) => {
       console.error("Error fetching user:", err);
+      if(err.name==="ValidationeError"){
+        return res
+        .status(BAD_REQUEST)
+        .send({message:"Invalid data provided for user creation."});
+      }
       return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
