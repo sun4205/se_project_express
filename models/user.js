@@ -32,7 +32,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "The password field is required."],
     select: false,
-    minlength: 8,
   },
 });
 userSchema.statics.findUserByCredentials = function (email, password) {
