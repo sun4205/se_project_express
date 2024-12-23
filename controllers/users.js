@@ -27,10 +27,10 @@ const getCurrentUser = (req, res) => {
     })
     .catch((err) => {
       console.error("Error fetching user:", err);
-      if(err.name==="ValidationeError"){
+      if (err.name === "ValidationeError") {
         return res
-        .status(BAD_REQUEST)
-        .send({message:"Invalid data provided for user creation."});
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data provided for user creation." });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
@@ -108,9 +108,13 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error("Login error:", err.message);
+
+      if (err.message === "Incorrect email or password") {
+        return res.status(UNAUTHORIZED).send({ message: err.message });
+      }
       res
-        .status(UNAUTHORIZED)
-        .send({ message: "Incorrect email or password." });
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error occurred on the server." });
     });
 };
 
@@ -147,4 +151,4 @@ const updateProfile = (req, res) => {
         .send({ message: "An error occurred on the server." });
     });
 };
-module.exports = {getCurrentUser, createUser, login, updateProfile };
+module.exports = { getCurrentUser, createUser, login, updateProfile };
