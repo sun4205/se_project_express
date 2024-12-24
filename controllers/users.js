@@ -110,10 +110,13 @@ const login = (req, res) => {
       console.error("Login error:", err.message);
 
       if (err.message === "Incorrect email or password") {
-        return res.status(UNAUTHORIZED).send({message: "Invalid data provided" });
+        return res
+          .status(UNAUTHORIZED)
+          .send({ message: "Invalid data provided" });
       }
-      
-        return res.status(INTERNAL_SERVER_ERROR)
+
+      return res
+        .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
     });
 };
