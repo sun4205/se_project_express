@@ -11,7 +11,7 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 const getItems = (req, res) => {
   Item.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.send(items))
     .catch((err) => {
       console.error(err);
       return res
@@ -56,7 +56,7 @@ const getItem = (req, res) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
       }
-      return res.status(200).send(item);
+      return res.send(item);
     })
     .catch((err) => {
       console.error(`Error fetching item by ID: ${id}`, err);
@@ -86,7 +86,7 @@ const deleteItem = (req, res) => {
       }
 
       return Item.findByIdAndDelete(itemId).then(() =>
-        res.status(200).send({ message: "Item deleted successfully." })
+        res.send({ message: "Item deleted successfully." })
       );
     })
     .catch((err) => {
@@ -117,7 +117,7 @@ const likeItem = (req, res) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
       }
-      return res.status(200).send(item);
+      return res.send(item);
     })
     .catch((err) => {
       console.error(err);
@@ -143,7 +143,7 @@ const dislikeItem = (req, res) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
       }
-      return res.status(200).send(item);
+      return res.send(item);
     })
     .catch((err) => {
       console.error(err);

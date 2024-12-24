@@ -23,7 +23,7 @@ const getCurrentUser = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found." });
       }
-      return res.status(200).send(user);
+      return res.send(user);
     })
     .catch((err) => {
       console.error("Error fetching user:", err);
@@ -104,13 +104,13 @@ const login = (req, res) => {
         expiresIn: "7d",
       });
 
-      return res.status(200).send({ token });
+      return res.send({ token });
     })
     .catch((err) => {
       console.error("Login error:", err.message);
 
       if (err.message === "Incorrect email or password") {
-        return res.status(UNAUTHORIZED).send({ message: err.message });
+        return res.status(UNAUTHORIZED).send({message: "Invalid data provided" });
       }
       
         return res.status(INTERNAL_SERVER_ERROR)
@@ -137,7 +137,7 @@ const updateProfile = (req, res) => {
       if (!updatedUser) {
         return res.status(NOT_FOUND).send({ message: "User not found." });
       }
-      return res.status(200).send(updatedUser);
+      return res.send(updatedUser);
     })
     .catch((err) => {
       console.error("Error updating user profile:", err);
