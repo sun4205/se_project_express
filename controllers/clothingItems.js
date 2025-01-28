@@ -9,129 +9,117 @@ const {
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-const getItems = (req, res) => {
+const getItems = (req, res,next) => {
   Item.find({})
     .then((items) => res.send(items))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
-    });
+    .catch((err) => next(err));
 };
 
-const createItem = (req, res) => {
+const createItem = (req, res,next) => {
   const { name, weather, imageUrl } = req.body;
 
   if (!req.user || !req.user._id) {
-    return res
-      .status(BAD_REQUEST)
-      .send({ message: "User is not authenticated." });
+    const error = new Error("User is not authenticated.");
+    error.statusCode = BAD_REQUEST;
+    return next(error);
   }
 
   const owner = req.user._id;
 
-  return Item.create({ name, weather, imageUrl, owner })
+  Item.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
-      console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
+        err.statusCode = BAD_REQUEST;
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occurred on the server." });
+      next(err);
     });
+    
 };
 
-const getItem = (req, res) => {
+const getItem = (req, res, next) => {
   const { id } = req.params;
 
   if (!isValidObjectId(id)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid ID format." });
+    const error = new Error("Invalid ID format.");
+    error.statusCode = BAD_REQUEST;
+    return next(error);
   }
 
   return Item.findById(id)
     .then((item) => {
       if (!item) {
-        return res.status(NOT_FOUND).send({ message: "Item not found." });
+        const error = new Error("Item not found.");
+        error.statusCode = NOT_FOUND;
+        throw error;
       }
-      return res.send(item);
+      res.send(item);
     })
-    .catch((err) => {
-      console.error(`Error fetching item by ID: ${id}`, err);
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occurred on the server." });
-    });
+    .catch((err) => next(err));
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
   if (!isValidObjectId(itemId)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
+    const error = new Error("Invalid item ID.");
+    error.statusCode = BAD_REQUEST;
+    return next(error);
   }
 
-  return Item.findById(itemId)
+ Item.findById(itemId)
 
     .then((item) => {
       if (!item) {
-        return res.status(NOT_FOUND).send({ message: "Item not found." });
+        const error = new Error("Item not found.");
+        error.statusCode = NOT_FOUND;
+        throw error;
       }
       if (item.owner.toString() !== req.user._id) {
-        return res
-          .status(FORBIDDEN)
-          .send({ message: "You do not have permission to delete this item." });
+        const error = new Error("You do not have permission to delete this item.");
+        error.statusCode = FORBIDDEN;
+        throw error;
       }
 
       return Item.findByIdAndDelete(itemId).then(() =>
         res.send({ message: "Item deleted successfully." })
       );
     })
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
-      }
-
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server" });
-    });
+    .catch((err) => next(err));
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res,next) => {
   const { itemId } = req.params;
 
   if (!isValidObjectId(itemId)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
+    const error = new Error("Invalid item ID.");
+    error.statusCode = BAD_REQUEST;
+    return next(error);
   }
 
-  return Item.findByIdAndUpdate(
+   Item.findByIdAndUpdate(
     itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
     .then((item) => {
       if (!item) {
-        return res.status(NOT_FOUND).send({ message: "Item not found." });
+        const error = new Error("Item not found.");
+        error.statusCode = NOT_FOUND;
+        throw error;
       }
       return res.send(item);
     })
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occurred on the server." });
-    });
+    .catch((err) => next(err));
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   const { itemId } = req.params;
 
   if (!isValidObjectId(itemId)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid item ID." });
+    const error = new Error("Invalid item ID.");
+    error.statusCode = BAD_REQUEST;
+    return next(error);
   }
 
   return Item.findByIdAndUpdate(
@@ -141,16 +129,13 @@ const dislikeItem = (req, res) => {
   )
     .then((item) => {
       if (!item) {
-        return res.status(NOT_FOUND).send({ message: "Item not found." });
+        const error = new Error("Item not found.");
+        error.statusCode = NOT_FOUND;
+        throw error;
       }
       return res.send(item);
     })
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occurred on the server." });
-    });
+    .catch((err) => next(err));
 };
 
 module.exports = {
