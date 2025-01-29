@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 const Item = require("../models/clothingItem");
 const {
   BAD_REQUEST,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
+  NOT_FOUND,  
   FORBIDDEN,
 } = require("../utils/errors");
 
@@ -32,7 +31,7 @@ const createItem = (req, res,next) => {
       if (err.name === "ValidationError") {
         err.statusCode = BAD_REQUEST;
       }
-      next(err);
+      next(error);
     });
     
 };
@@ -85,7 +84,7 @@ const deleteItem = (req, res, next) => {
         res.send({ message: "Item deleted successfully." })
       );
     })
-    .catch((err) => next(err));
+    .catch((error) => next(error));
 };
 
 const likeItem = (req, res,next) => {
@@ -110,7 +109,7 @@ const likeItem = (req, res,next) => {
       }
       return res.send(item);
     })
-    .catch((err) => next(err));
+    .catch((error) => next(error));
 };
 
 const dislikeItem = (req, res, next) => {
@@ -135,7 +134,7 @@ const dislikeItem = (req, res, next) => {
       }
       return res.send(item);
     })
-    .catch((err) => next(err));
+    .catch((error) => next(error));
 };
 
 module.exports = {
