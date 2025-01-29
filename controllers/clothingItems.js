@@ -28,6 +28,7 @@ const createItem = (req, res,next) => {
   Item.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
+      const error = new Error(err.message || "Validation error");
       if (err.name === "ValidationError") {
         err.statusCode = BAD_REQUEST;
       }
@@ -52,7 +53,7 @@ const getItem = (req, res, next) => {
         error.statusCode = NOT_FOUND;
         throw error;
       }
-      res.send(item);
+      return res.send(item);
     })
     .catch((err) => next(err));
 };

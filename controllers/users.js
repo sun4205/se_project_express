@@ -27,7 +27,7 @@ const getCurrentUser = (req, res, next) => {
         error.statusCode = NOT_FOUND;
         return next(error);
       }
-      res.send(user);
+      return res.send(user);
     })
     .catch(next); 
 };
@@ -63,7 +63,7 @@ const createUser = (req, res, next) => {
         avatar: user.avatar,
         email: user.email,
       };
-      res.status(201).send(userResponse);
+      return res.status(201).send(userResponse);
     })
     .catch(next); 
 };
@@ -82,7 +82,7 @@ const login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
-      res.send({ token });
+      return res.send({ token });
     })
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
@@ -112,7 +112,7 @@ const updateProfile = (req, res, next) => {
         error.statusCode = NOT_FOUND;
         return next(error);
       }
-      res.send(updatedUser);
+      return res.send(updatedUser);
     })
     .catch(next); 
 };
