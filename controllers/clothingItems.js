@@ -25,13 +25,11 @@ const createItem = (req, res,next) => {
 
   const owner = req.user._id;
 
-  Item.create({ name, weather, imageUrl, owner })
+  return Item.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       const error = new Error(err.message || "Validation error");
-      if (err.name === "ValidationError") {
-        err.statusCode = BAD_REQUEST;
-      }
+      error.statusCode = err.name === "ValidationError" ? BAD_REQUEST : 500; 
       next(error);
     });
     
@@ -67,7 +65,7 @@ const deleteItem = (req, res, next) => {
     return next(error);
   }
 
- Item.findById(itemId)
+ return Item.findById(itemId)
 
     .then((item) => {
       if (!item) {
@@ -97,7 +95,7 @@ const likeItem = (req, res,next) => {
     return next(error);
   }
 
-   Item.findByIdAndUpdate(
+   return Item.findByIdAndUpdate(
     itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true }
