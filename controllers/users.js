@@ -64,7 +64,14 @@ const createUser = (req, res, next) => {
       };
       return res.status(201).send(userResponse);
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        const validationError = new Error("Bad Request");
+        validationError.statusCode = 400;
+        return next(validationError);
+      }
+      return next(err);
+    });
 };
 
 const login = (req, res, next) => {
