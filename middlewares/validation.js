@@ -16,7 +16,7 @@ const validateEmail = (value,helpers) => {
 }
 
 const validateItem = (value,helpers) => {
-    if(!validator.isHexadecimal(value) || value.length == 24){
+    if(!validator.isHexadecimal(value) || value.length === 24){
         return value;
     }
     return helpers.error('Invalid ID format: must be a 24-character hexadecimal string')

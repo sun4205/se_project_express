@@ -6,8 +6,7 @@ const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST,
   CONFLICT,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
+  NOT_FOUND,  
   UNAUTHORIZED,
 } = require("../utils/errors");
 
@@ -20,7 +19,7 @@ const getCurrentUser = (req, res, next) => {
     return next(error);
   }
 
-  User.findById(userId)
+  return User.findById(userId)
     .then((user) => {
       if (!user) {
         const error = new Error("User not found.");
@@ -29,7 +28,7 @@ const getCurrentUser = (req, res, next) => {
       }
       return res.send(user);
     })
-    .catch(next); 
+    .catch((err) => next(err)); 
 };
 
 
@@ -44,7 +43,7 @@ const createUser = (req, res, next) => {
     return next(error);
   }
 
-  User.findOne({ email })
+  return User.findOne({ email })
     .then((existingUser) => {
       if (existingUser) {
         const error = new Error("A user with this email already exists.");
@@ -65,7 +64,7 @@ const createUser = (req, res, next) => {
       };
       return res.status(201).send(userResponse);
     })
-    .catch(next); 
+    .catch((err) => next(err));
 };
 
 const login = (req, res, next) => {
@@ -77,7 +76,7 @@ const login = (req, res, next) => {
     return next(error);
   }
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
@@ -88,9 +87,9 @@ const login = (req, res, next) => {
       if (err.message === "Incorrect email or password") {
         const error = new Error("Invalid data provided.");
         error.statusCode = UNAUTHORIZED;
-        return next(error);
+        return Promise.reject(error).catch(next);
       }
-      next(err); 
+      return Promise.reject(err).catch(next);
     });
 };
 
@@ -110,11 +109,11 @@ const updateProfile = (req, res, next) => {
       if (!updatedUser) {
         const error = new Error("User not found.");
         error.statusCode = NOT_FOUND;
-        return next(error);
+        return Promise.reject(error).catch(next);;
       }
       return res.send(updatedUser);
     })
-    .catch(next); 
+    .catch((err) => Promise.reject(err).catch(next)); 
 };
 
 module.exports = { getCurrentUser, createUser, login, updateProfile };
