@@ -104,7 +104,7 @@ const updateProfile = (req, res, next) => {
     return next(error);
   }
 
-  User.findByIdAndUpdate(userId, { name, avatar }, { new: true, runValidators: true })
+  return User.findByIdAndUpdate(userId, { name, avatar }, { new: true, runValidators: true })
     .then((updatedUser) => {
       if (!updatedUser) {
         const error = new Error("User not found.");
