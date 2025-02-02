@@ -22,10 +22,10 @@ const getItems = (req, res, next) => {
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
-  if (!req.user || !req.user._id) {
-    console.error("Authentication error:", error);
+  if (!req.user || !req.user._id) {   
     const error = new Error("User is not authenticated.");
     error.statusCode = UNAUTHORIZED;
+    console.error("Authentication error:", error);
     return next(error);
   }
 
@@ -35,6 +35,7 @@ const createItem = (req, res, next) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       console.error("Error in createItem:", err.message);
+      const error = new Error(err.message);
       err.statusCode =
         err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
       next(err);
