@@ -4,6 +4,7 @@ const {
   BAD_REQUEST,
   NOT_FOUND,  
   FORBIDDEN,
+  INTERNAL_SERVER_ERROR
 } = require("../utils/errors");
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -29,7 +30,7 @@ const createItem = (req, res,next) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       const error = new Error(err.message || "Validation error");
-      error.statusCode = err.name === "ValidationError" ? BAD_REQUEST : 500; 
+      error.statusCode = err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR; 
       next(error);
     });
     
