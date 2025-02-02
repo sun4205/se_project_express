@@ -2,25 +2,30 @@ const mongoose = require("mongoose");
 const Item = require("../models/clothingItem");
 const {
   BAD_REQUEST,
-  NOT_FOUND,  
+  NOT_FOUND,
   FORBIDDEN,
-  INTERNAL_SERVER_ERROR
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
 } = require("../utils/errors");
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-const getItems = (req, res,next) => {
+const getItems = (req, res, next) => {
   Item.find({})
     .then((items) => res.send(items))
-    .catch((err) => next(err));
+    .catch((err) => {
+      console.error("Error in getItems", err.message);
+      next(err);
+    });
 };
 
-const createItem = (req, res,next) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
   if (!req.user || !req.user._id) {
+    console.error("Authentication error:", error);
     const error = new Error("User is not authenticated.");
-    error.statusCode = BAD_REQUEST;
+    error.statusCode = UNAUTHORIZED;
     return next(error);
   }
 
@@ -29,20 +34,22 @@ const createItem = (req, res,next) => {
   return Item.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
-      const error = new Error(err.message || "Validation error");
-      error.statusCode = err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR; 
-      next(error);
+      console.error("Error in createItem:", err.message);
+      err.statusCode =
+        err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
+      next(err);
     });
-    
 };
 
 const getItem = (req, res, next) => {
   const { id } = req.params;
 
   if (!isValidObjectId(id)) {
-    const error = new Error("Invalid ID format.");
-    error.statusCode = BAD_REQUEST;
-    return next(error);
+    console.error("Invalid ID format:", id);
+    const err = new Error("ID is invalid.");
+    err.statusCode = BAD_REQUEST; 
+    return next(err);
+    
   }
 
   return Item.findById(id)
@@ -54,19 +61,23 @@ const getItem = (req, res, next) => {
       }
       return res.send(item);
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      console.error("Error in getItems:",err.message);
+      next(err)
+});
 };
 
 const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
   if (!isValidObjectId(itemId)) {
+    console.error("Invalid ID format:", itemId);
     const error = new Error("Invalid item ID.");
     error.statusCode = BAD_REQUEST;
     return next(error);
   }
 
- return Item.findById(itemId)
+  return Item.findById(itemId)
 
     .then((item) => {
       if (!item) {
@@ -75,7 +86,9 @@ const deleteItem = (req, res, next) => {
         throw error;
       }
       if (item.owner.toString() !== req.user._id) {
-        const error = new Error("You do not have permission to delete this item.");
+        const error = new Error(
+          "You do not have permission to delete this item."
+        );
         error.statusCode = FORBIDDEN;
         throw error;
       }
@@ -84,19 +97,23 @@ const deleteItem = (req, res, next) => {
         res.send({ message: "Item deleted successfully." })
       );
     })
-    .catch((error) => next(error));
+    .catch((error) =>{
+      console.error("Error in deleteItems", error.message);
+     next(error)
+});
 };
 
-const likeItem = (req, res,next) => {
+const likeItem = (req, res, next) => {
   const { itemId } = req.params;
 
   if (!isValidObjectId(itemId)) {
+    console.error("Invalid ID format:", itemId);
     const error = new Error("Invalid item ID.");
     error.statusCode = BAD_REQUEST;
     return next(error);
   }
 
-   return Item.findByIdAndUpdate(
+  return Item.findByIdAndUpdate(
     itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true }
@@ -109,13 +126,17 @@ const likeItem = (req, res,next) => {
       }
       return res.send(item);
     })
-    .catch((error) => next(error));
+    .catch((error) => {
+      console.error("Error in likeItem", error.message);
+      next(error)
+});
 };
 
 const dislikeItem = (req, res, next) => {
   const { itemId } = req.params;
 
   if (!isValidObjectId(itemId)) {
+    console.error("Invalid ID format:", itemId);
     const error = new Error("Invalid item ID.");
     error.statusCode = BAD_REQUEST;
     return next(error);
@@ -134,7 +155,10 @@ const dislikeItem = (req, res, next) => {
       }
       return res.send(item);
     })
-    .catch((error) => next(error));
+    .catch((error) =>{
+      console.error("Error in dislikeItem", error.message);
+      next(error);
+});
 };
 
 module.exports = {
