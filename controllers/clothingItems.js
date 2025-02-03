@@ -35,14 +35,12 @@ const createItem = (req, res, next) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       console.error("Error in createItem:", err.message);
-      if (err.name === "ValidationError") {
-        const validationError = new Error("Invalid input data.");
-        validationError.statusCode = BAD_REQUEST;
-        return next(validationError);
-      }
-      const internalError = new Error("An unexpected error occurred.");
-      internalError.statusCode = INTERNAL_SERVER_ERROR;
-      return next(internalError);  
+      const error = new Error(
+        err.name === "ValidationError" ? "Invalid input data." : "An unexpected error occurred."
+      );
+      error.statusCode = err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
+
+      return next(error);
     });
 };
 
