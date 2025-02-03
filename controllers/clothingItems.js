@@ -4,6 +4,7 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   FORBIDDEN, 
+  INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } = require("../utils/errors");
 
@@ -39,6 +40,9 @@ const createItem = (req, res, next) => {
         validationError.statusCode = BAD_REQUEST;
         return next(validationError);
       }
+      const internalError = new Error("An unexpected error occurred.");
+      internalError.statusCode = INTERNAL_SERVER_ERROR;
+      return next(internalError);  
     });
 };
 
