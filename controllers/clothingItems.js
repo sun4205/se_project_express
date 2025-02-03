@@ -22,7 +22,7 @@ const getItems = (req, res, next) => {
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
-  if (!req.user || !req.user._id) {   
+  if (!req.user || !req.user._id) {
     const error = new Error("User is not authenticated.");
     error.statusCode = UNAUTHORIZED;
     console.error("Authentication error:", error);
@@ -35,10 +35,11 @@ const createItem = (req, res, next) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       console.error("Error in createItem:", err.message);
-      const error = new Error(err.message);
-      error.statusCode =
-        err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
-      next(error);
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Invalid input data."));
+      } else {
+        next(error);
+      }
     });
 };
 
@@ -48,9 +49,8 @@ const getItem = (req, res, next) => {
   if (!isValidObjectId(id)) {
     console.error("Invalid ID format:", id);
     const err = new Error("ID is invalid.");
-    err.statusCode = BAD_REQUEST; 
+    err.statusCode = BAD_REQUEST;
     return next(err);
-    
   }
 
   return Item.findById(id)
@@ -63,9 +63,9 @@ const getItem = (req, res, next) => {
       return res.send(item);
     })
     .catch((err) => {
-      console.error("Error in getItems:",err.message);
-      next(err)
-});
+      console.error("Error in getItems:", err.message);
+      next(err);
+    });
 };
 
 const deleteItem = (req, res, next) => {
@@ -98,10 +98,10 @@ const deleteItem = (req, res, next) => {
         res.send({ message: "Item deleted successfully." })
       );
     })
-    .catch((error) =>{
+    .catch((error) => {
       console.error("Error in deleteItems", error.message);
-     next(error)
-});
+      next(error);
+    });
 };
 
 const likeItem = (req, res, next) => {
@@ -129,8 +129,8 @@ const likeItem = (req, res, next) => {
     })
     .catch((error) => {
       console.error("Error in likeItem", error.message);
-      next(error)
-});
+      next(error);
+    });
 };
 
 const dislikeItem = (req, res, next) => {
@@ -156,10 +156,10 @@ const dislikeItem = (req, res, next) => {
       }
       return res.send(item);
     })
-    .catch((error) =>{
+    .catch((error) => {
       console.error("Error in dislikeItem", error.message);
       next(error);
-});
+    });
 };
 
 module.exports = {
