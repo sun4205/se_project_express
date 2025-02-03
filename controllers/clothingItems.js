@@ -36,7 +36,7 @@ const createItem = (req, res, next) => {
     .catch((err) => {
       console.error("Error in createItem:", err.message);
       const error = new Error(err.message);
-      err.statusCode =
+      error.statusCode =
         err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
       next(error);
     });
