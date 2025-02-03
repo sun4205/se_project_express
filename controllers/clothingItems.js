@@ -3,8 +3,7 @@ const Item = require("../models/clothingItem");
 const {
   BAD_REQUEST,
   NOT_FOUND,
-  FORBIDDEN,
-  INTERNAL_SERVER_ERROR,
+  FORBIDDEN, 
   UNAUTHORIZED,
 } = require("../utils/errors");
 
@@ -36,9 +35,9 @@ const createItem = (req, res, next) => {
     .catch((err) => {
       console.error("Error in createItem:", err.message);
       if (err.name === "ValidationError") {
-        return next(new BadRequestError("Invalid input data."));
-      } else {
-        next(error);
+        const validationError = new Error("Invalid input data.");
+        validationError.statusCode = BAD_REQUEST;
+        return next(validationError);
       }
     });
 };
