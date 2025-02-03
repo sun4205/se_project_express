@@ -38,7 +38,7 @@ const createItem = (req, res, next) => {
       const error = new Error(err.message);
       err.statusCode =
         err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
-      next(err);
+      next(error);
     });
 };
 
