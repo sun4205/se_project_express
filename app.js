@@ -25,11 +25,6 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Server will crash now');
-  }, 0);
-});
 
 app.use("/", mainRouter);
 app.use(errorLogger);
