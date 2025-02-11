@@ -3,9 +3,15 @@ const Item = require("../models/clothingItem");
 const {
   BAD_REQUEST,
   NOT_FOUND,
-  FORBIDDEN, 
+  FORBIDDEN,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
+  BadRequestError,
+  UnauthorizedError,
+  NotFoundError,
+  ForbiddenError,
+  ConflictError,
+  InternalServerError,
 } = require("../utils/errors");
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -23,10 +29,8 @@ const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
   if (!req.user || !req.user._id) {
-    const error = new Error("User is not authenticated.");
-    error.statusCode = UNAUTHORIZED;
     console.error("Authentication error:", error);
-    return next(error);
+    return next(new UnauthorizedError("User is not authenticated."));
   }
 
   const owner = req.user._id;
@@ -35,12 +39,11 @@ const createItem = (req, res, next) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       console.error("Error in createItem:", err.message);
-      const error = new Error(
-        err.name === "ValidationError" ? "Invalid input data." : "An unexpected error occurred."
-      );
-      error.statusCode = err.name === "ValidationError" ? BAD_REQUEST : INTERNAL_SERVER_ERROR;
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Invalid input data."));
+      }
 
-      return next(error);
+      return next(new InternalServerError("An unexpected error occurred."));
     });
 };
 
