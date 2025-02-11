@@ -4,28 +4,26 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
-  BAD_REQUEST,
-  CONFLICT,
-  NOT_FOUND,
-  UNAUTHORIZED,
+  BAD_REQUEST, 
+  BadRequestError,  
+  NotFoundError,
+  UnauthorizedError,
 } = require("../utils/errors");
+const { ConflictError } = require("../utils/errors/ConflictError");
 
 const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     console.error("Invalid ID format:", userId);
-    const error = new Error("Invalid user ID format.");
-    error.statusCode = BAD_REQUEST;
-    return next(error);
+
+    return next(new BadRequestError("Invalid user ID format."));
   }
 
   return User.findById(userId)
     .then((user) => {
       if (!user) {
-        const error = new Error("User not found.");
-        error.statusCode = NOT_FOUND;
-        return next(error);
+        return next(new NotFoundError("User not found."));
       }
       return res.send(user);
     })
@@ -40,20 +38,20 @@ const createUser = (req, res, next) => {
 
   if (!name || !avatar || !email || !password) {
     console.error("Validation Error: All fields are required");
-    const error = new Error(
-      "All fields ('name', 'avatar', 'email', and 'password') are required."
+
+    return next(
+      new BadRequestError("Validation Error: All fields are required")
     );
-    error.statusCode = BAD_REQUEST;
-    return next(error);
   }
 
   return User.findOne({ email })
     .then((existingUser) => {
       if (existingUser) {
         console.error(`Conflict Error:${email} is already registered`);
-        const error = new Error("A user with this email already exists.");
-        error.statusCode = CONFLICT;
-        return next(error);
+
+        return next(
+          new ConflictError("A user with this email already exists.")
+        );
       }
 
       return bcrypt
@@ -74,9 +72,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       console.error("Error in createUser:", err.message);
       if (err.name === "ValidationError") {
-        const validationError = new Error("Bad Request");
-        validationError.statusCode = 400;
-        return next(validationError);
+        return next(new BAD_REQUEST("Bad Request"));
       }
       return next(err);
     });
@@ -87,9 +83,8 @@ const login = (req, res, next) => {
 
   if (!email || !password) {
     console.error("Validation Error: Email and password are required");
-    const error = new Error("Email and password are required.");
-    error.statusCode = BAD_REQUEST;
-    return next(error);
+
+    return next(new BAD_REQUEST("Email and password are required."));
   }
 
   return User.findUserByCredentials(email, password)
@@ -103,9 +98,8 @@ const login = (req, res, next) => {
       console.error("Authentication Error:", err.message);
       if (err.message === "Incorrect email or password") {
         console.error("Invalid data provied");
-        const error = new Error("Invalid data provided.");
-        error.statusCode = UNAUTHORIZED;
-        return next(error);
+
+        return next(new UnauthorizedError("Invalid data provided."));
       }
 
       return next(err);
@@ -120,9 +114,10 @@ const updateProfile = (req, res, next) => {
     console.error(
       "Validation Error: Both 'name' and 'avatar' fields are required."
     );
-    const error = new Error("Both 'name' and 'avatar' fields are required.");
-    error.statusCode = BAD_REQUEST;
-    return next(error);
+
+    return next(
+      new BadRequestError("Both 'name' and 'avatar' fields are required.")
+    );
   }
 
   return User.findByIdAndUpdate(
@@ -133,10 +128,8 @@ const updateProfile = (req, res, next) => {
     .then((updatedUser) => {
       if (!updatedUser) {
         console.error("user not found");
-        const error = new Error("User not found.");
-        error.statusCode = NOT_FOUND;
 
-        return next(error);
+        return next(new NotFoundError("User not found."));
       }
       return res.send(updatedUser);
     })
