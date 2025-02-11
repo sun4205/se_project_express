@@ -1,20 +1,12 @@
 const mongoose = require("mongoose");
 const Item = require("../models/clothingItem");
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  FORBIDDEN,
-  INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,  
   BadRequestError,
-    ConflictError,
-    ForbiddenError,
-    InternalServerError,
-    NotFoundError,
-    UnauthorizedError,
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+  UnauthorizedError,
 } = require("../utils/errors");
-
-
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -54,14 +46,14 @@ const getItem = (req, res, next) => {
 
   if (!isValidObjectId(id)) {
     console.error("Invalid ID format:", id);
-    
+
     return next(new BadRequestError("Invalid Id"));
   }
 
   return Item.findById(id)
     .then((item) => {
       if (!item) {
-       return next(new NotFoundError("Item is not found"))
+        return next(new NotFoundError("Item is not found"));
       }
       return res.send(item);
     })
@@ -76,7 +68,7 @@ const deleteItem = (req, res, next) => {
 
   if (!isValidObjectId(itemId)) {
     console.error("Invalid ID format:", itemId);
-    
+
     return next(new BadRequestError("Invalid item Id"));
   }
 
@@ -87,7 +79,9 @@ const deleteItem = (req, res, next) => {
         return next(new NotFoundError("Item not found."));
       }
       if (item.owner.toString() !== req.user._id) {
-        return next(new ForbiddenError("You do not have permission to delete this item."))
+        return next(
+          new ForbiddenError("You do not have permission to delete this item.")
+        );
       }
 
       return Item.findByIdAndDelete(itemId).then(() =>
@@ -105,7 +99,7 @@ const likeItem = (req, res, next) => {
 
   if (!isValidObjectId(itemId)) {
     console.error("Invalid ID format:", itemId);
-    
+
     return next(new BadRequestError("Invalid item ID."));
   }
 
@@ -116,7 +110,7 @@ const likeItem = (req, res, next) => {
   )
     .then((item) => {
       if (!item) {
-        return next(new NotFoundError("Item is not found"))
+        return next(new NotFoundError("Item is not found"));
       }
       return res.send(item);
     })
