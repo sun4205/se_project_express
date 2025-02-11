@@ -6,7 +6,7 @@ const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST,
   CONFLICT,
-  NOT_FOUND,  
+  NOT_FOUND,
   UNAUTHORIZED,
 } = require("../utils/errors");
 
@@ -32,9 +32,8 @@ const getCurrentUser = (req, res, next) => {
     .catch((err) => {
       console.error("Error in getCurrentUser:", err.message);
       next(err);
-}); 
+    });
 };
-
 
 const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
@@ -57,9 +56,11 @@ const createUser = (req, res, next) => {
         return next(error);
       }
 
-      return bcrypt.hash(password, 10).then((hashedPassword) =>
-        User.create({ name, avatar, email, password: hashedPassword })
-      );
+      return bcrypt
+        .hash(password, 10)
+        .then((hashedPassword) =>
+          User.create({ name, avatar, email, password: hashedPassword })
+        );
     })
     .then((user) => {
       const userResponse = {
@@ -85,7 +86,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    console.error("Validation Error: Email and password are required")
+    console.error("Validation Error: Email and password are required");
     const error = new Error("Email and password are required.");
     error.statusCode = BAD_REQUEST;
     return next(error);
@@ -101,45 +102,48 @@ const login = (req, res, next) => {
     .catch((err) => {
       console.error("Authentication Error:", err.message);
       if (err.message === "Incorrect email or password") {
-        console.error("Invalid data provied")
+        console.error("Invalid data provied");
         const error = new Error("Invalid data provided.");
         error.statusCode = UNAUTHORIZED;
         return next(error);
-      //   return Promise.reject(error).catch(next);
-       }
-      // return Promise.reject(err).catch(next);
+      }
+
       return next(err);
     });
 };
-
 
 const updateProfile = (req, res, next) => {
   const userId = req.user._id;
   const { name, avatar } = req.body;
 
   if (!name || !avatar) {
-    console.error("Validation Error: Both 'name' and 'avatar' fields are required.");
+    console.error(
+      "Validation Error: Both 'name' and 'avatar' fields are required."
+    );
     const error = new Error("Both 'name' and 'avatar' fields are required.");
     error.statusCode = BAD_REQUEST;
     return next(error);
   }
 
-  return User.findByIdAndUpdate(userId, { name, avatar }, { new: true, runValidators: true })
+  return User.findByIdAndUpdate(
+    userId,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
     .then((updatedUser) => {
       if (!updatedUser) {
-        console.error("user not found")
+        console.error("user not found");
         const error = new Error("User not found.");
         error.statusCode = NOT_FOUND;
-        // return Promise.reject(error).catch(next);
+
         return next(error);
       }
       return res.send(updatedUser);
     })
     .catch((err) => {
-      // Promise.reject(err).catch(next)
       console.error("Update Profile Error:", err.message);
-      return next(err); 
-}); 
+      return next(err);
+    });
 };
 
 module.exports = { getCurrentUser, createUser, login, updateProfile };
