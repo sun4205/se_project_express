@@ -5,14 +5,16 @@ const {
   NOT_FOUND,
   FORBIDDEN,
   INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,
+  UNAUTHORIZED,  
   BadRequestError,
-  UnauthorizedError,
-  NotFoundError,
-  ForbiddenError,
-  ConflictError,
-  InternalServerError,
+    ConflictError,
+    ForbiddenError,
+    InternalServerError,
+    NotFoundError,
+    UnauthorizedError,
 } = require("../utils/errors");
+
+
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -29,7 +31,7 @@ const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
   if (!req.user || !req.user._id) {
-    console.error("Authentication error:", error);
+    console.error("Authentication error: User is not authenticated.");
     return next(new UnauthorizedError("User is not authenticated."));
   }
 
@@ -40,7 +42,7 @@ const createItem = (req, res, next) => {
     .catch((err) => {
       console.error("Error in createItem:", err.message);
       if (err.name === "ValidationError") {
-        return next(new BadRequestError("Invalid input data."));
+        return next(new BadRequestError("Invalid data."));
       }
 
       return next(new InternalServerError("An unexpected error occurred."));
@@ -52,23 +54,20 @@ const getItem = (req, res, next) => {
 
   if (!isValidObjectId(id)) {
     console.error("Invalid ID format:", id);
-    const err = new Error("ID is invalid.");
-    err.statusCode = BAD_REQUEST;
-    return next(err);
+    
+    return next(new BadRequestError("Invalid Id"));
   }
 
   return Item.findById(id)
     .then((item) => {
       if (!item) {
-        const error = new Error("Item not found.");
-        error.statusCode = NOT_FOUND;
-        throw error;
+       return next(new NotFoundError("Item is not found"))
       }
       return res.send(item);
     })
     .catch((err) => {
       console.error("Error in getItems:", err.message);
-      next(err);
+      return next(err);
     });
 };
 
