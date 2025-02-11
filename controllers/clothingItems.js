@@ -76,25 +76,18 @@ const deleteItem = (req, res, next) => {
 
   if (!isValidObjectId(itemId)) {
     console.error("Invalid ID format:", itemId);
-    const error = new Error("Invalid item ID.");
-    error.statusCode = BAD_REQUEST;
-    return next(error);
+    
+    return next(new BadRequestError("Invalid item Id"));
   }
 
   return Item.findById(itemId)
 
     .then((item) => {
       if (!item) {
-        const error = new Error("Item not found.");
-        error.statusCode = NOT_FOUND;
-        throw error;
+        return next(new NotFoundError("Item not found."));
       }
       if (item.owner.toString() !== req.user._id) {
-        const error = new Error(
-          "You do not have permission to delete this item."
-        );
-        error.statusCode = FORBIDDEN;
-        throw error;
+        return next(new ForbiddenError("You do not have permission to delete this item."))
       }
 
       return Item.findByIdAndDelete(itemId).then(() =>
@@ -112,9 +105,8 @@ const likeItem = (req, res, next) => {
 
   if (!isValidObjectId(itemId)) {
     console.error("Invalid ID format:", itemId);
-    const error = new Error("Invalid item ID.");
-    error.statusCode = BAD_REQUEST;
-    return next(error);
+    
+    return next(new BadRequestError("Invalid item ID."));
   }
 
   return Item.findByIdAndUpdate(
@@ -124,9 +116,7 @@ const likeItem = (req, res, next) => {
   )
     .then((item) => {
       if (!item) {
-        const error = new Error("Item not found.");
-        error.statusCode = NOT_FOUND;
-        throw error;
+        return next(new NotFoundError("Item is not found"))
       }
       return res.send(item);
     })
@@ -141,9 +131,7 @@ const dislikeItem = (req, res, next) => {
 
   if (!isValidObjectId(itemId)) {
     console.error("Invalid ID format:", itemId);
-    const error = new Error("Invalid item ID.");
-    error.statusCode = BAD_REQUEST;
-    return next(error);
+    return next(new BadRequestError("Invalid Id format"));
   }
 
   return Item.findByIdAndUpdate(
@@ -153,9 +141,7 @@ const dislikeItem = (req, res, next) => {
   )
     .then((item) => {
       if (!item) {
-        const error = new Error("Item not found.");
-        error.statusCode = NOT_FOUND;
-        throw error;
+        return next(new NotFoundError("Item is not found"));
       }
       return res.send(item);
     })
