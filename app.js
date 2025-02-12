@@ -2,7 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const mongoose = require("mongoose");
 const cors = require("cors");
-require('dotenv').config();
+require("dotenv").config();
 const { errors } = require("celebrate");
 
 const mainRouter = require("./routes/index");
@@ -24,7 +24,6 @@ app.use(requestLogger);
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-
 
 app.use("/", mainRouter);
 app.use(errorLogger);

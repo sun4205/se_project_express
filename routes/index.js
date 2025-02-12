@@ -2,14 +2,16 @@ const express = require("express");
 const userRouter = require("./users");
 const itemRouter = require("./clothingItems");
 const { login, createUser } = require("../controllers/users");
-const {validateUserInfo,validateUserLogin} = require("../middlewares/validation");
+const {
+  validateUserInfo,
+  validateUserLogin,
+} = require("../middlewares/validation");
 const NotFoundError = require("../utils/errors/NotFoundError");
 
 const router = express.Router();
 
- router.post("/signin", validateUserLogin,login);
- router.post("/signup", validateUserInfo,createUser);
-
+router.post("/signin", validateUserLogin, login);
+router.post("/signup", validateUserInfo, createUser);
 
 router.use("/items", itemRouter);
 router.use("/users", userRouter);

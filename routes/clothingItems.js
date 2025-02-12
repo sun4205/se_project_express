@@ -6,7 +6,10 @@ const {
   likeItem,
   dislikeItem,
 } = require("../controllers/clothingItems");
-const {validateClothingItem,validatedId} = require("../middlewares/validation");
+const {
+  validateClothingItem,
+  validatedId,
+} = require("../middlewares/validation");
 const auth = require("../middlewares/auth");
 
 router.get("/", getItems);
