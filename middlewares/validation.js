@@ -32,8 +32,13 @@ const validateClothingItem = celebrate({
   
       imageUrl: Joi.string().required().custom(validateURL).messages({
         "string.empty": 'The "imageUrl" field must be filled in',
-        "string.uri": 'the "imageUrl" field must be a valid url',
+        "string.uri": 'The "imageUrl" field must be a valid url',
       }),
+
+      weather: Joi.string().valid('hot', 'warm', 'cold').required().messages({
+        "any.only": 'The "weather" field must be one of the following: hot, warm, cold',
+        "string.empty": 'The "weather" field must be filled in',
+      })
     }),
   });
 
@@ -69,8 +74,8 @@ const validateClothingItem = celebrate({
 
   const validatedId = celebrate({
     params: Joi.object().keys({
-        id: Joi.string().custom(validateItem).required().messages({
-            'any.required': 'ID is required.',
+    itemId: Joi.string().custom(validateItem).required().messages({
+            'any.required': 'itemId is required.',
         }),
       }),
   })
