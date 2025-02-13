@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
-const { BAD_REQUEST } = require("../utils/errors");
 const NotFoundError = require("../utils/errors/NotFoundError");
 const UnauthorizedError = require("../utils/errors/UnauthorizedError");
 const BadRequestError = require("../utils/errors/BadRequestError");
@@ -70,7 +69,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       console.error("Error in createUser:", err.message);
       if (err.name === "ValidationError") {
-        return next(new BAD_REQUEST("Bad Request"));
+        return next(new BadRequestError("Bad Request"));
       }
       return next(err);
     });
@@ -82,7 +81,7 @@ const login = (req, res, next) => {
   if (!email || !password) {
     console.error("Validation Error: Email and password are required");
 
-    return next(new BAD_REQUEST("Email and password are required."));
+    return next(new BadRequestError("Email and password are required."));
   }
 
   return User.findUserByCredentials(email, password)
