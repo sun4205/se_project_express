@@ -51,13 +51,13 @@ const validateUserInfo = celebrate({
       "string.min": 'The minimum length of the "name" field is 2',
       "string.max": 'The maximum length of the "name" field is 30',
     }),
-    avatar: Joi.string().custom(validateURL).required().message({
+    avatar: Joi.string().custom(validateURL).required().messages({
       "any.required": "Avatar URL is required.",
     }),
-    email: Joi.string().custom(validateEmail).required().message({
+    email: Joi.string().custom(validateEmail).required().messages({
       "any.required": "Email is required.",
     }),
-    password: Joi.string().required().message({
+    password: Joi.string().required().messages({
       "any.required": "Password is required.",
     }),
   }),
@@ -65,10 +65,10 @@ const validateUserInfo = celebrate({
 
 const validateUserLogin = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().custom(validateEmail).required().message({
+    email: Joi.string().custom(validateEmail).required().messages({
       "any.required": "Email is required.",
     }),
-    password: Joi.string().required().message({
+    password: Joi.string().required().messages({
       "any.required": "Password is required.",
     }),
   }),
@@ -89,7 +89,7 @@ const validateUserProfile = celebrate({
       "string.max": 'The maximum length of the "name" field is 30',
       "any.required": 'The "name" field is required',
     }),
-    avatar: Joi.string().custom(validateURL).required().message({
+    avatar: Joi.string().custom(validateURL).required().messages({
       "any.required": "Avatar URL is required.",
     }),
   }),
