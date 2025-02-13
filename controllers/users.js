@@ -6,7 +6,7 @@ const { JWT_SECRET } = require("../utils/config");
 const NotFoundError = require("../utils/errors/NotFoundError");
 const UnauthorizedError = require("../utils/errors/UnauthorizedError");
 const BadRequestError = require("../utils/errors/BadRequestError");
-const  ConflictError  = require("../utils/errors/ConflictError");
+const ConflictError = require("../utils/errors/ConflictError");
 
 const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
