@@ -11,7 +11,7 @@ The back-end project is focused on creating a server for the WTWR application. U
 - Configured routes and controllers to handle API requests and ensure seamless functionality. 
 - Integrated a MongoDB database with the server for efficient data storage and retrieval. 
 
- 
+ ## Deploy
 
-- project on GitHub Pages (https://github.com/sun4205/se_project_express.git)
-- Homepage (https://fit24.jumpingcrab.com)
+- GitHub Frontend [https://github.com/sun4205/se_project_react.git](https://github.com/sun4205/se_project_react.git)
+- Homepage [https://fit24.jumpingcrab.com](https://fit24.jumpingcrab.com)
